@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Finite Integral calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h3>Calculate integral of given characteristics:</h3>
+        
+        <form action="QueryAcceptingServlet" method="GET">
+            <p>Integral formula:<input type=text size=20 name=integralFormula></p>
+            <p>Calculation range beginning:<input type=text size=20 name=calcRangeBegin></p>
+            <p>Calculation range end:<input type=text size=20 name=calcRangeEnd></p>
+            <p>Calculation method:<input type="text" size="20" name="calcMethod"></p>
+            <p>Calculation accuracy:<input type="text" size="20" name="calcAccuracy"></p>
+            
+            <input type="submit" value="Calculate!" />
+        </form>
+        
+        <hr>
+        
+        <h3>Get all queries done during server uptime:</h3>
+        <form action="HistoryRetrieverServlet">
+            <input type="submit" value="Show me history!" />
+        </form>
+    </body>
+</html>
