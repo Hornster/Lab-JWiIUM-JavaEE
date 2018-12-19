@@ -10,13 +10,18 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import pl.polsl.model.BackendContainer;
+import pl.polsl.model.CalculationData;
+import pl.polsl.model.IntegralData;
 import pl.polsl.model.PredefinedCommunicates;
 import pl.polsl.model.ServerCommand;
 import pl.polsl.model.exceptions.IntegralCalculationException;
+import pl.polsl.model.queryHistory.CalcResultListener;
+import pl.polsl.model.queryHistory.SingleQuery;
 import pl.polsl.server.CommandParser;
 import pl.polsl.server.CommandWrapper;
 
@@ -24,8 +29,11 @@ import pl.polsl.server.CommandWrapper;
  *
  * @author Karol
  */
-public class QueryAcceptingServlet extends HttpServlet {
-    
+public class QueryAcceptingServlet extends HttpServlet implements CalcResultListener {
+    /**
+     * Stores ID of last serviced by this servlet instance query.
+     */
+    private int lastServicedQueryID;
     /**
      * Reference to the backendContainer - singleton that stores the essential classes of the server's functionality.
      */
@@ -34,6 +42,7 @@ public class QueryAcceptingServlet extends HttpServlet {
      * Creates commands out of parameters that are parsed later on.
      */
     private CommandWrapper commandWrapper = new CommandWrapper();
+    
     /**
      * Parses passed parameters using info about command which they belong to.
      * @param parameters List of parameters.
@@ -94,10 +103,20 @@ public class QueryAcceptingServlet extends HttpServlet {
             return ex.getMessage();
         }
     }
+    /**
+     * Creates new cookie that contains index of last query made by the user.
+     * @param queryIndex
+     * @return Cookie with information about index of last made query by the user.
+     */
+    private Cookie assignCookie(Integer queryIndex)
+    {
+        return new Cookie(LastQueryCookieServlet.lastQueryCookieName, queryIndex.toString());
+    }
     
     public QueryAcceptingServlet()
     {
         backendContainer = BackendContainer.getInstance();
+        backendContainer.registerCalcResultListener(this);
     }
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -112,6 +131,7 @@ public class QueryAcceptingServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -121,6 +141,7 @@ public class QueryAcceptingServlet extends HttpServlet {
             out.println("<body>");
             String answer = readParams(request);
             out.println(answer);
+            response.addCookie(assignCookie(lastServicedQueryID));
             out.println("</body>");
             out.println("</html>");
         }
@@ -164,6 +185,11 @@ public class QueryAcceptingServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    @Override
+    public void newCalculationPerformed(CalculationData calculationData, IntegralData integralData) {
+        lastServicedQueryID = backendContainer.queryManager.addQuery(new SingleQuery(integralData,calculationData)); //To change body of generated methods, choose Tools | Templates.
+    }
 
 }
 
