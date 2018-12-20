@@ -7,6 +7,7 @@ package pl.polsl.model;
 
 import pl.polsl.controller.calculation.CalcModuleServerAdapter;
 import pl.polsl.controller.calculation.CalculationModule;
+import pl.polsl.model.queryHistory.CalcResultListener;
 import pl.polsl.model.queryHistory.QueryManager;
 import pl.polsl.server.CommandParser;
 
@@ -39,8 +40,14 @@ public class BackendContainer {
     private BackendContainer()
     {
         commandsDescriptions = CommandsDescriptions.getInstance();
-        integralCalculator.addListener(queryManager);
-        
+    }
+    /**
+     * Registers new calculation result listener to the calculationModule.
+     * @param newListener New listener for calculations result.
+     */
+    public void registerCalcResultListener(CalcResultListener newListener)
+    {
+        integralCalculator.addListener(newListener);
     }
     /**
      * If not created yet, creates the only instance of this class.

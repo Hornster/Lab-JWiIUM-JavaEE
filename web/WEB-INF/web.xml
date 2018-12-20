@@ -8,6 +8,10 @@
         <servlet-name>QueryAcceptingServlet</servlet-name>
         <servlet-class>pl.polsl.servlets.QueryAcceptingServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>LastQueryCookieServlet</servlet-name>
+        <servlet-class>pl.polsl.servlets.LastQueryCookieServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HistoryRetrieverServlet</servlet-name>
         <url-pattern>/HistoryRetrieverServlet</url-pattern>
@@ -15,5 +19,9 @@
     <servlet-mapping>
         <servlet-name>QueryAcceptingServlet</servlet-name>
         <url-pattern>/QueryAcceptingServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LastQueryCookieServlet</servlet-name>
+        <url-pattern>/LastQueryCookieServlet</url-pattern>
     </servlet-mapping>
 </web-app>

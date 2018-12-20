@@ -10,18 +10,22 @@ import java.util.Map;
  * by the user during runtime.
  *
  * @author Karol KozuchGroup 4 Section 8
- * @version 1.1.1*/
+ * @version 1.1.2*/
 public class QueryHistory implements Iterable<SingleQuery> {
     /**Amount of mementos in this collection.*/
     private int itemsCount=0;
     /**All queries made by the user during single runtime.*/
     private Map<Integer, SingleQuery> queries = new HashMap<>();
     /**Adds single query to the history.
-     * @param singleQuery Object to add.*/
-    public void addItem(SingleQuery singleQuery)
+     * @param singleQuery Object to add.
+     *@return  Index of the newly added query.*/
+    public int addItem(SingleQuery singleQuery)
     {
+        int queryIndex;
         queries.put(itemsCount, singleQuery);
+        queryIndex = itemsCount;
         itemsCount++;
+        return queryIndex;
     }
     /**Returns a copy of single query. If none available - returns null.
      * @param index Index of requested query.

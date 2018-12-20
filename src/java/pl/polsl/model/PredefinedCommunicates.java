@@ -3,6 +3,18 @@ package pl.polsl.model;
  * @author Karol Kozuch Group 4 Section 8
  * @version 1.0*/
 public class PredefinedCommunicates {
+    public static String cookieDataCorrupted()
+    {
+        return "The data provided in the cookie was corrupted. Couldn't make anything out of it, sorry.";
+    }
+    /**
+     * Called when the client requested last made query by them but in fact they did not made any yet.
+     * @return String describing that the client hasn't made any queries yet.
+     */
+    public static String noQueriesMadeYet()
+    {
+        return "You haven't made any queries yet, darling!";
+    }
     /**
      * Called when there are no queries in the query history.
      * @return Message explaining absence of queries in the history.
