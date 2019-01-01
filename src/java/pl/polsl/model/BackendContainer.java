@@ -9,7 +9,7 @@ import pl.polsl.controller.calculation.CalcModuleServerAdapter;
 import pl.polsl.controller.calculation.CalculationModule;
 import pl.polsl.model.queryHistory.CalcResultListener;
 import pl.polsl.model.queryHistory.QueryManager;
-import pl.polsl.server.CommandParser;
+import pl.polsl.controller.server.CommandParser;
 
 /**Stores only one instance of data on the server. As long as the server's up.
  * @author Karol Kozuch Group 4 Section 8
@@ -36,6 +36,10 @@ public class BackendContainer {
      * Calculates the integral using provided data.
      */
     public CalcModuleServerAdapter integralCalculator = new CalcModuleServerAdapter(new CalculationModule());
+    /**
+     * Stores data about sessions that were connected to the server.
+     */
+    public SessionData sessionData = new SessionData();
     
     private BackendContainer()
     {

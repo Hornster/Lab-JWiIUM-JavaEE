@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pl.polsl.servlets;
+package pl.polsl.controller.server.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +20,7 @@ import pl.polsl.utility.dataCheck.ParseModifyString;
 
 /**Servlet that accepts request for last made by the user query.
  * @author Karol Kozuch Group 4 Section 8
- * @version 1.0*/
+ * @version 1.0.5*/
 public class LastQueryCookieServlet extends HttpServlet {
     /**
      * Name for the cookie that stores ID of last query made by the user.
@@ -59,7 +59,7 @@ public class LastQueryCookieServlet extends HttpServlet {
         }
         catch(NoQueryFoundException ex)
         {
-            return ex.getMessage();
+            return "No queries made yet, darling!";
         }
     }
     /**

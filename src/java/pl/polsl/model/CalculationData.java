@@ -5,6 +5,9 @@ package pl.polsl.model;
  * @author Karol Kozuch Group 4 Section 8
  * @version 1.0*/
 public class CalculationData {
+    /**
+     * Available types of approximation.
+     */
     public enum calcMethodTypes{t, s}
     /**Amount of geometrical shapes used in approximation. Default is 10000*/
     private int accuracy = 10000;

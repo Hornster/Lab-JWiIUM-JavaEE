@@ -5,6 +5,10 @@ import pl.polsl.model.ServerCommand;
 import pl.polsl.model.exceptions.IntegralCalculationException;
 import pl.polsl.model.queryHistory.CalcResultListener;
 
+/** Adapts CalculationModule class to be able to use ServerCommands as data source.
+ * @author Karol Kozuch Group 4 Section 8
+ * @version 1.0.2
+ */
 public class CalcModuleServerAdapter {
     /**The adaptee of this adapter.*/
     private CalculationModule calculationModule;

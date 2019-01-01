@@ -1,4 +1,4 @@
-package pl.polsl.server;
+package pl.polsl.controller.server;
 
 import pl.polsl.model.CommandsDescriptions;
 import pl.polsl.model.IntegralData;

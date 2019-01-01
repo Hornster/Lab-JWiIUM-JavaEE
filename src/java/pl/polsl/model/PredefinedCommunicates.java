@@ -3,6 +3,10 @@ package pl.polsl.model;
  * @author Karol Kozuch Group 4 Section 8
  * @version 1.0*/
 public class PredefinedCommunicates {
+    /**
+     * Called when data from a cookie is corrupted.
+     * @return String with explanation of that the cookie data has been corrupted.
+     */
     public static String cookieDataCorrupted()
     {
         return "The data provided in the cookie was corrupted. Couldn't make anything out of it, sorry.";

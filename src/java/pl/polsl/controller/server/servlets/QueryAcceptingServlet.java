@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pl.polsl.servlets;
+package pl.polsl.controller.server.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,7 +14,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import pl.polsl.model.BackendContainer;
 import pl.polsl.model.CalculationData;
 import pl.polsl.model.IntegralData;
@@ -23,12 +22,12 @@ import pl.polsl.model.ServerCommand;
 import pl.polsl.model.exceptions.IntegralCalculationException;
 import pl.polsl.model.queryHistory.CalcResultListener;
 import pl.polsl.model.queryHistory.SingleQuery;
-import pl.polsl.server.CommandParser;
-import pl.polsl.server.CommandWrapper;
+import pl.polsl.controller.server.CommandParser;
+import pl.polsl.controller.server.CommandWrapper;
 
-/**
- *
- * @author Karol
+/** Servlet that accepts calculation queries from clients, informs them about errors and returns results.
+ * @author Karol Kozuch Group 4 Section 8
+ * @version 1.1
  */
 public class QueryAcceptingServlet extends HttpServlet implements CalcResultListener {
     /**
@@ -97,6 +96,9 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
             
             //If the program got here - trigger calculations and return the result.
             Double result = backendContainer.integralCalculator.performCalculation();
+            
+            //Add the queries to the session
+            backendContainer.sessionData.addQueryToSession(request.getSession().getId(), lastServicedQueryID);
             return PredefinedCommunicates.calcResult() + result.toString();
         }
         catch(IntegralCalculationException ex)
@@ -131,6 +133,10 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        //Add the SessionData object to this session, if not done yet.
+        backendContainer.sessionData.ChkIfSessionBound(request.getSession());
+        
         try (PrintWriter out = response.getWriter()) {
             
             /* TODO output your page here. You may use following sample code. */

@@ -1,9 +1,9 @@
-package pl.polsl.server;
+package pl.polsl.controller.server;
 
 
 import java.util.LinkedList;
 import java.util.List;
-import pl.polsl.server.CommandParser;
+import pl.polsl.controller.server.CommandParser;
 
 /** Used to determine if received commands are correct.
  * @author Karol Kozuch Group 4 Section 8
