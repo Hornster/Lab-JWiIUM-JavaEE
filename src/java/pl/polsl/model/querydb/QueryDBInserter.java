@@ -7,7 +7,7 @@ import pl.polsl.model.queryHistory.SingleQuery;
  *
  * @author Karol KozuchGroup 4 Section 8
  * @version 1.0*/
-public class InsertDataApp {
+public class QueryDBInserter {
     /**
      * Extracts data from the query in proper sequence and creates an update command out of it.
      * @param query Query with data.
