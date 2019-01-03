@@ -94,4 +94,12 @@ public class QueryDBManager {
     {
         return queryDBInserter;
     }
+    /**
+     * Gets the current connection to the database.
+     * @return Object containing data about connection with the db.
+     */
+    public Connection getDBConnection()
+    {
+        return queryDBConnManager.getDBConnection();
+    }
 }
