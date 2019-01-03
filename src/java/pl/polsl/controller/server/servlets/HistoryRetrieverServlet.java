@@ -13,7 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import pl.polsl.model.BackendContainer;
 import pl.polsl.model.queryHistory.SingleQuery;
 import pl.polsl.model.querydb.DBManagerIniException;
 import pl.polsl.model.querydb.QueryDBManager;
