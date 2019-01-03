@@ -7,12 +7,16 @@ package pl.polsl.controller.server.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import pl.polsl.model.BackendContainer;
+import pl.polsl.model.queryHistory.SingleQuery;
+import pl.polsl.model.querydb.DBManagerIniException;
+import pl.polsl.model.querydb.QueryDBManager;
 
 /** Service that returns to client info about already made queries during server uptime.
  * @author Karol Kozuch Group 4 Section 8
@@ -20,16 +24,35 @@ import pl.polsl.model.BackendContainer;
  */
 public class HistoryRetrieverServlet extends HttpServlet {
     /**
-     * Reference to instance of object storing all functionalities connected with this server.
+     * Reference to instance of object storing all functionalities connected with this server's database.
      */
-    private final BackendContainer backendContainer;
+    private QueryDBManager queryDBManager;
     
     public HistoryRetrieverServlet()
     {
-        backendContainer = BackendContainer.getInstance();
+        try
+        {
+            queryDBManager = QueryDBManager.getInstance();
+        }
+        catch(DBManagerIniException ex)
+        {
+            queryDBManager = null;
+            System.out.println("Could not initialize the database manager! " + ex.getMessage());
+        }
     }
-    
-    
+    /**
+     * Prints the sent queries to the output, using the <br> separator.
+     * @param queries Queries to send to client.
+     * @param out Stream that sends data to client.
+     */
+    private void printQueries(List<SingleQuery> queries, PrintWriter out)
+    {
+        for(SingleQuery query : queries)
+        {
+            query.setLineSeparator("<br>");
+            out.println(query.toString());
+        }
+    }
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -41,9 +64,6 @@ public class HistoryRetrieverServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        //Add the SessionData object to this session, if not done yet.
-        backendContainer.sessionData.ChkIfSessionBound(request.getSession());
         
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
@@ -57,8 +77,18 @@ public class HistoryRetrieverServlet extends HttpServlet {
             out.println("<h1>Requested information about queries made by you during session uptime:</h1>");
             out.println();
             out.println();
-            List<Integer> queriesMadeByClient = backendContainer.sessionData.getSessionQueries(request.getSession().getId());
-            out.println(backendContainer.queryManager.getSelectedQueriesDesc(queriesMadeByClient, "<br />"));
+            if(queryDBManager != null)
+            {
+                String sessionID = request.getSession().getId();
+                Connection dbConnection = queryDBManager.getDBConnection();
+                List<SingleQuery> queriesMadeByClient = queryDBManager.getSelector().selectData(dbConnection, sessionID);
+                printQueries(queriesMadeByClient, out);
+            }
+            else
+            {
+                out.println("Error - could not establish connection with the database. Please try again later.");
+            }
+            
             out.println("</body>");
             out.println("</html>");
         }
