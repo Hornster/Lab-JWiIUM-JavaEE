@@ -7,6 +7,7 @@ package pl.polsl.controller.server.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -24,20 +25,34 @@ import pl.polsl.model.queryHistory.CalcResultListener;
 import pl.polsl.model.queryHistory.SingleQuery;
 import pl.polsl.controller.server.CommandParser;
 import pl.polsl.controller.server.CommandWrapper;
+import pl.polsl.model.querydb.DBManagerIniException;
+import pl.polsl.model.querydb.QueryDBManager;
 
 /** Servlet that accepts calculation queries from clients, informs them about errors and returns results.
  * @author Karol Kozuch Group 4 Section 8
- * @version 1.1
+ * @version 1.2
  */
 public class QueryAcceptingServlet extends HttpServlet implements CalcResultListener {
     /**
-     * Stores ID of last serviced by this servlet instance query.
+     * Stores ID given by the database to the user that has recently made a query.
      */
-    private int lastServicedQueryID;
+    private int lastInnerSessionID;
+    /**
+     * Stores ID of last made query.
+     */
+    private int lastMadeQueryID;
+    /**
+     * Stores the object of last serviced by this servlet query.
+     */
+    private SingleQuery lastQuery;
     /**
      * Reference to the backendContainer - singleton that stores the essential classes of the server's functionality.
      */
     private BackendContainer backendContainer;
+    /**
+     * Reference to class that contains other classes that maintain and communicate wih the database
+     */
+    private QueryDBManager queryDBManager;
     /**
      * Creates commands out of parameters that are parsed later on.
      */
@@ -61,6 +76,20 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
         command = commandWrapper.createCommand(parameterType);
         
         return backendContainer.commandParser.ParseCommand(command);
+    }
+    /**
+     * Adds a query to the database. If session connected with the query is not present - it will be added too.
+     * @param sessionID ID of the session.
+     */
+    private void addDataToDB(String sessionID)
+    {
+        Connection dbConnection = queryDBManager.getDBConnection();
+        queryDBManager.getInserter().insertData(dbConnection, sessionID);
+        lastInnerSessionID = queryDBManager.getSelector().getInternalSessionID(dbConnection, sessionID);
+        
+        lastMadeQueryID = queryDBManager.getSelector().getLastQueryID(dbConnection, lastInnerSessionID);
+        
+        queryDBManager.getInserter().insertData(dbConnection, lastInnerSessionID, lastQuery);
     }
     /**
      * Reads parameters from passed request.
@@ -98,7 +127,8 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
             Double result = backendContainer.integralCalculator.performCalculation();
             
             //Add the queries to the session
-            backendContainer.sessionData.addQueryToSession(request.getSession().getId(), lastServicedQueryID);
+            //backendContainer.sessionData.addQueryToSession(request.getSession().getId(), lastServicedQueryID);
+            addDataToDB(request.getSession().getId());
             return PredefinedCommunicates.calcResult() + result.toString();
         }
         catch(IntegralCalculationException ex)
@@ -120,6 +150,14 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
     {
         backendContainer = BackendContainer.getInstance();
         backendContainer.registerCalcResultListener(this);
+        try
+        {
+            queryDBManager = QueryDBManager.getInstance();
+        }
+        catch(DBManagerIniException ex)
+        {
+            System.out.println("Could not initialize the database manager! It will be unavaiable for this session. \n" + ex.getMessage());
+        }
     }
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -148,7 +186,8 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
             out.println("<body>");
             String answer = readParams(request);
             out.println(answer);
-            response.addCookie(assignCookie(lastServicedQueryID));
+            response.addCookie(assignCookie(lastMadeQueryID));            
+            response.addCookie(assignCookie(lastInnerSessionID));
             out.println("</body>");
             out.println("</html>");
         }
@@ -195,7 +234,7 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
 
     @Override
     public void newCalculationPerformed(CalculationData calculationData, IntegralData integralData) {
-        lastServicedQueryID = backendContainer.queryManager.addQuery(new SingleQuery(integralData,calculationData)); //To change body of generated methods, choose Tools | Templates.
+        lastQuery = new SingleQuery(integralData,calculationData); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

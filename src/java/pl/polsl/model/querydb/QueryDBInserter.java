@@ -8,6 +8,7 @@ import pl.polsl.model.queryHistory.SingleQuery;
  * @author Karol KozuchGroup 4 Section 8
  * @version 1.0*/
 public class QueryDBInserter {
+    
     /**
      * Extracts data from the query in proper sequence and creates an update command out of it.
      * @param query Query with data.
@@ -17,7 +18,14 @@ public class QueryDBInserter {
     {
         char space = ' ';
         StringBuilder command = new StringBuilder();
-        command.append("INSERT INTO SessionData VALUES (");
+        command.append("INSERT INTO QueriesData(session_id, "
+            + "formula, "
+            + "range_beg,"
+            + "range_end,"
+            + "argument,"
+            + "result,"
+            + "method,"
+            + "accuracy) VALUES (");
         command.append(sessionID);
         command.append(space);
         command.append(query.getMathFunction());
@@ -58,6 +66,7 @@ public class QueryDBInserter {
      * @param dbConnection Connection with the database. 
      * @param sessionID ID of the session that caused data insertion.
      * @param query Data of the query that has been made.
+     * 
      */
     public void insertData(Connection dbConnection, int sessionID, SingleQuery query) {
         // make a connection to DB

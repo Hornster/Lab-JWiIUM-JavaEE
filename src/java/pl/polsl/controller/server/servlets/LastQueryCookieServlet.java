@@ -7,6 +7,7 @@ package pl.polsl.controller.server.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -16,16 +17,26 @@ import pl.polsl.model.BackendContainer;
 import pl.polsl.model.PredefinedCommunicates;
 import pl.polsl.model.exceptions.NoQueryFoundException;
 import pl.polsl.model.queryHistory.SingleQuery;
+import pl.polsl.model.querydb.DBManagerIniException;
+import pl.polsl.model.querydb.QueryDBManager;
 import pl.polsl.utility.dataCheck.ParseModifyString;
 
 /**Servlet that accepts request for last made by the user query.
  * @author Karol Kozuch Group 4 Section 8
- * @version 1.0.5*/
+ * @version 1.1*/
 public class LastQueryCookieServlet extends HttpServlet {
     /**
      * Name for the cookie that stores ID of last query made by the user.
      */
     public static final String lastQueryCookieName = "lastQueryIndicator";
+    /**
+     * Name for the cookie that stores ID of session of the user.
+     */
+    public static final String dbSessionIDName = "dbSessionIDName";
+    /**
+     * Reference to class that contains other classes that maintain and communicate wih the database
+     */
+    private QueryDBManager queryDBManager;
     /**
      * Reference to the BackendContainer singleton
      */
@@ -34,32 +45,41 @@ public class LastQueryCookieServlet extends HttpServlet {
     public LastQueryCookieServlet()
     {
         backendContainer = BackendContainer.getInstance();
+        
+         try
+        {
+            queryDBManager = QueryDBManager.getInstance();
+        }
+        catch(DBManagerIniException ex)
+        {
+            System.out.println("Could not initialize the database manager! It will be unavaiable for this session. \n" + ex.getMessage());
+        }
     }
     /**
      * If possible, retrieves query under index passed as value String.
-     * @param value Value, for example from a cookie.
+     * @param lastQueryIndexValue Value, for example from a cookie.
      * @return Last query or information of error that occured and made retrieving the query impossible.
      */
-    private String retrieveUserQuery(String value)
+    private String retrieveUserQuery(String lastQueryIndexValue)
     {
-        try
+        if(ParseModifyString.tryStringToInt(lastQueryIndexValue))
         {
-            if(ParseModifyString.tryStringToInt(value))
+            Connection dbConnection = queryDBManager.getDBConnection();
+            int queryIndex = Integer.parseInt(lastQueryIndexValue);
+
+            if(queryIndex < 0)
             {
-                int queryIndex = Integer.parseInt(value);
-                SingleQuery requestedQuery = backendContainer.queryManager.getQuery(queryIndex);
-                requestedQuery.setLineSeparator("<br />");
-                
-                return requestedQuery.toString();
+                return "No queries made yet, darling!";
             }
-            else
-            {
-                return PredefinedCommunicates.cookieDataCorrupted();
-            }
+
+            SingleQuery requestedQuery = queryDBManager.getSelector().readLastQuery(dbConnection, queryIndex);
+            requestedQuery.setLineSeparator("<br />");
+
+            return requestedQuery.toString();
         }
-        catch(NoQueryFoundException ex)
+        else
         {
-            return "No queries made yet, darling!";
+            return PredefinedCommunicates.cookieDataCorrupted();
         }
     }
     /**
@@ -73,13 +93,15 @@ public class LastQueryCookieServlet extends HttpServlet {
         if(cookies == null)
             return PredefinedCommunicates.noQueriesMadeYet();
         
+        
         for(Cookie cookie : cookies)
         {
-            if(cookie.getName().equals(lastQueryCookieName))
+            if(cookies[0].getName().equals(lastQueryCookieName))
             {
-                return retrieveUserQuery(cookie.getValue());
+                return retrieveUserQuery(cookies[0].getValue());
             }
         }
+        
         //If no last query cookie was found - user made no queries during the session yet.
         return PredefinedCommunicates.noQueriesMadeYet();
     }

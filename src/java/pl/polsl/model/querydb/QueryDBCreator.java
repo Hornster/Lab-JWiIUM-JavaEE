@@ -12,7 +12,8 @@ public class QueryDBCreator {
     private String sessionDataTableDesc = "CREATE TABLE SessionsData"
             + "(short_id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY UNIQUE, full_id VARCHAR(50) UNIQUE)";
     private String queryDataTableDesc = "CREATE TABLE QueriesData"
-            + "(session_id INTEGER , "
+            + "(query_id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY UNIQUE,"
+            + "session_id INTEGER , "
             + "formula VARCHAR(50), "
             + "range_beg FLOAT"
             + "range_end FLOAT"

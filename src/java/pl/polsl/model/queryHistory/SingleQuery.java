@@ -65,6 +65,7 @@ public class SingleQuery {
         this.result = source.result;
     }
 
+    public SingleQuery(){}
     public SingleQuery(IntegralData integralData, CalculationData calcData)
     {
         if(integralData != null) {
@@ -210,6 +211,5 @@ public class SingleQuery {
 
         return builder.toString();
     }
-
-
+    
 }
