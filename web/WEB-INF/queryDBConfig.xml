@@ -8,7 +8,7 @@ and open the template in the editor.
 
 <config>
     <jdbc>
-        <url>jdbc:derby://localhost:1527/lab", "lab", "lab"</url>
+        <url>jdbc:derby://localhost:1527/lab;create=true</url>
         <username>lab</username>
         <password>lab</password>
         <driver>org.apache.derby.jdbc.ClientDriver</driver>

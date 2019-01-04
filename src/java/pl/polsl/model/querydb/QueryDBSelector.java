@@ -77,7 +77,7 @@ public class QueryDBSelector {
         try{
             Statement statement = dbConnection.createStatement();
             ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData s, QueriesData q"
-                    + "WHERE s.full_id = "+ sessionID +" AND q.session_id = s.short_id");
+                    + "WHERE s.full_id = '"+ sessionID +"' AND q.session_id = s.short_id");
             
             results = readResultSet(rs);
             rs.close();
@@ -98,11 +98,11 @@ public class QueryDBSelector {
     {
         SingleQuery result = null;
         
-        try{
-            Statement statement = dbConnection.createStatement();
+        try(Statement statement = dbConnection.createStatement();
             ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData s, QueriesData q"
-                    + "WHERE s.full_id = "+ sessionID +" AND q.session_id = s.short_id"
-                            + "ORDER BY q.session_id ASC");
+                    + "WHERE s.full_id = "+ "'" + sessionID + "'" +" AND q.session_id = s.short_id"
+                            + "ORDER BY q.session_id ASC");){
+            
             if(rs.next())
             {
                 result = readSingleQuery(rs);
@@ -118,6 +118,7 @@ public class QueryDBSelector {
     /**
      * Reads last query made by user under given sessionID.
      * @param dbConnection Connection to the database.
+     * @param queryID ID of the query
      * @return Last made query of the user. If none made - returns null.
      */
     public SingleQuery readLastQuery(Connection dbConnection, int queryID)
@@ -126,8 +127,7 @@ public class QueryDBSelector {
         
         try(Statement statement = dbConnection.createStatement();
             ResultSet rs = statement.executeQuery("SELECT * FROM QueriesData q"
-                            + "WHERE q.query_id =" + queryID 
-                            + "ORDER BY q.session_id ASC");
+                            + "WHERE q.query_id = '" + queryID + "'");
                 )
         {
             
@@ -153,10 +153,9 @@ public class QueryDBSelector {
     public int getInternalSessionID(Connection dbConnection, String externalSessionID)
     {
         int result = -1;
-        try{
-            Statement statement = dbConnection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData s"
-                    + "WHERE s.full_id = "+ externalSessionID);
+        try(Statement statement = dbConnection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData "
+                    + "WHERE SessionsData.full_id = '" + externalSessionID + "'");){
             
             if(rs.next())
             {
@@ -182,7 +181,7 @@ public class QueryDBSelector {
         try(Statement statement = dbConnection.createStatement();
             ResultSet rs = statement.executeQuery("SELECT q.query_id FROM QueriesData q"
                                                     + "WHERE q.session_id = " + sessionID
-                                                    + "ORDER BY q.query_id ASC");
+                                                    + "ORDER BY q.query_id DESC");
                 )
         {
             if(rs.next())

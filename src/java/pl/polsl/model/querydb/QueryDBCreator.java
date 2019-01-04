@@ -10,19 +10,25 @@ import java.sql.*;
 public class QueryDBCreator {
     
     private String sessionDataTableDesc = "CREATE TABLE SessionsData"
-            + "(short_id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY UNIQUE, full_id VARCHAR(50) UNIQUE)";
+            + "(short_id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1),"
+            + " full_id VARCHAR(50) UNIQUE)";
     private String queryDataTableDesc = "CREATE TABLE QueriesData"
-            + "(query_id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY UNIQUE,"
+            + "(query_id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1),"
             + "session_id INTEGER , "
             + "formula VARCHAR(50), "
-            + "range_beg FLOAT"
-            + "range_end FLOAT"
-            + "argument CHAR"
-            + "result FLOAT"
-            + "method CHAR"
-            + "accuracy INTEGER"
+            + "range_beg FLOAT, "
+            + "range_end FLOAT, "
+            + "argument CHAR, "
+            + "result FLOAT, "
+            + "method CHAR, "
+            + "accuracy INTEGER, "
             + "FOREIGN KEY (session_id) REFERENCES (SessionsData.short_id)";
-    public void createTables(Connection dbConnection) {
+    
+    /**
+     * Creates tables, if these are non-existent.
+     * @param dbConnection Connection to the database.
+     */
+    private void createTables(Connection dbConnection) {
           // make a connection to DB
         try  {
             Statement statement = dbConnection.createStatement();
@@ -33,5 +39,14 @@ public class QueryDBCreator {
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
         }
+    }
+    /**
+     * Creates database if necessary, selects it and adds tables if necessary.
+     * Keep in mind that this method shall be called only by user that has permissions to create databases and tables!
+     * @param dbConnection Connection to the database.
+     */
+    public void setupDatabase(Connection dbConnection)
+    {
+        createTables(dbConnection);
     }
 }

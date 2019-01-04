@@ -8,15 +8,30 @@ import pl.polsl.model.queryHistory.SingleQuery;
  * @author Karol KozuchGroup 4 Section 8
  * @version 1.0*/
 public class QueryDBInserter {
-    
+    /**
+     * Prepares the given cjunk of data to be inserted into SQL command.
+     * Puts a ' sign at the beginning and end of the string and a space at the very end, in the end.
+     * @param builder StringBuilder that is being used to create the command.
+     * @param dataChunk Atomic data chunk that shall be added to command.
+     */
+    private void addDataChunk(StringBuilder builder, String dataChunk)
+    {
+        char space = ' ';
+        String dividor = "'";
+        
+        builder.append(dividor);
+        builder.append(dataChunk);
+        builder.append(dividor);
+        builder.append(space);
+    }
     /**
      * Extracts data from the query in proper sequence and creates an update command out of it.
      * @param query Query with data.
      * @return Update command for the database that contains data from provided query.
      */
-    private String prepareQueryUpdateCommand(SingleQuery query, int sessionID)
+    private String prepareQueryUpdateCommand(SingleQuery query, Integer sessionID)
     {
-        char space = ' ';
+        
         StringBuilder command = new StringBuilder();
         command.append("INSERT INTO QueriesData(session_id, "
             + "formula, "
@@ -26,22 +41,14 @@ public class QueryDBInserter {
             + "result,"
             + "method,"
             + "accuracy) VALUES (");
-        command.append(sessionID);
-        command.append(space);
-        command.append(query.getMathFunction());
-        command.append(space);
-        command.append(query.getRangeBegin());
-        command.append(space);
-        command.append(query.getRangeEnd());
-        command.append(space);
-        command.append(query.getArgument());
-        command.append(space);
-        command.append(query.getResult());
-        command.append(space);
-        command.append(query.getMethod());
-        command.append(space);
-        command.append(query.getAccuracy());
-        command.append(space);
+        addDataChunk(command, sessionID.toString());
+        addDataChunk(command, query.getMathFunction());
+        addDataChunk(command, query.getRangeBegin().toString());
+        addDataChunk(command, query.getRangeEnd().toString());
+        addDataChunk(command, query.getArgument().toString());
+        addDataChunk(command, query.getResult().toString());
+        addDataChunk(command, query.getMethod().toString());
+        addDataChunk(command, query.getAccuracy().toString());
         command.append(")");
         
         return command.toString();
@@ -55,7 +62,7 @@ public class QueryDBInserter {
         // make a connection to DB
         try {
             Statement statement = dbConnection.createStatement();
-            statement.executeUpdate("INSERT INTO SessionData(full_id) VALUES (" + sessionID + ")");
+            statement.executeUpdate("INSERT INTO SessionsData(full_id) VALUES (" + "'" + sessionID + "'" + ")");
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
         }

@@ -66,7 +66,7 @@ public class QueryHistoryTests {
         i = 1;
         for(SingleQuery query : history)
         {
-            Assert.assertEquals(i, query.getAccuracy());
+            Assert.assertEquals(i, (int)query.getAccuracy());
             i++;
         }
 

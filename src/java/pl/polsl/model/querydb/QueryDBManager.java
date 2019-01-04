@@ -18,11 +18,11 @@ public class QueryDBManager {
     /**
      * Instance of table recreating object.
      */
-    private QueryDBCreator queryDBCreator;
+    private final QueryDBCreator queryDBCreator = new QueryDBCreator();
     /**
      * Instance of the connection manager.
      */
-    private QueryDBConnectionManager queryDBConnManager;
+    private final QueryDBConnectionManager queryDBConnManager = new QueryDBConnectionManager();
     /**
      * Instance of the query selector - object that retrieves data from the database.
      */
@@ -54,7 +54,7 @@ public class QueryDBManager {
                     + queryDBConnManager.toString());
         }
         Connection dbConnection = queryDBConnManager.getDBConnection();
-        queryDBCreator.createTables(dbConnection);
+        queryDBCreator.setupDatabase(dbConnection);
     }
     /**
      * If the instance is not yet existent - creates it.

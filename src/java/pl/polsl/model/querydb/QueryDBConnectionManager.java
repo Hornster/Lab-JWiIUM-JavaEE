@@ -5,6 +5,7 @@
  */
 package pl.polsl.model.querydb;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -50,19 +51,12 @@ public class QueryDBConnectionManager {
         {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse("queryDBConfig.xml");
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
-
-            url = (String)xpath.compile("//web-app//jdbc//url").evaluate(document, XPathConstants.STRING);;
-            username = (String) xpath.compile("//web-app//jdbc//username").evaluate(document, XPathConstants.STRING);
-            password = (String) xpath.compile("//web-app//jdbc//password").evaluate(document, XPathConstants.STRING);
-            driver = (String) xpath.compile("//web-app//jdbc//driver").evaluate(document, XPathConstants.STRING);
-        }
-        catch(XPathExpressionException ex)
-        {
-            System.out.println("Could not load connection data from web.xml. Reason: \n"+ ex.getMessage());
-            return false;
+            Document document = builder.parse("web" + File.separator + "WEB-INF" + File.separator + "queryDBConfig.xml");
+            
+            url = document.getElementsByTagName("url").item(0).getTextContent();
+            username = document.getElementsByTagName("username").item(0).getTextContent();
+            password = document.getElementsByTagName("password").item(0).getTextContent();
+            driver = document.getElementsByTagName("driver").item(0).getTextContent();
         }
         catch(SAXException ex)    
         {

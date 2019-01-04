@@ -112,7 +112,7 @@ public class SingleQuery {
      * Gets the beginning of the range.
      * @return The end of the integral range.
      */
-    public double getRangeBegin() {
+    public Double getRangeBegin() {
         return rangeBegin;
     }
     /**Sets the beginning of the calculation range.
@@ -125,7 +125,7 @@ public class SingleQuery {
      * Gets the end of the range.
      * @return The end of the range.
      */
-    public double getRangeEnd() {
+    public Double getRangeEnd() {
         return rangeEnd;
     }
     /**Sets the end of the calculation range.
@@ -138,7 +138,7 @@ public class SingleQuery {
      * Gets the accuracy (amount of geometrical shapes used in approximation).
      * @return Accuracy of the approximation.
      */
-    public int getAccuracy() {
+    public Integer getAccuracy() {
         return accuracy;
     }
     /**Sets the amount of geometrical shapes that took part in approximation.
@@ -151,7 +151,7 @@ public class SingleQuery {
      * Gets the method used in approximation.
      * @return Single character that represents used approximation method.
      */
-    public char getMethod() {
+    public Character getMethod() {
         return method;
     }
     /**Sets the method used for approximation.
@@ -164,7 +164,7 @@ public class SingleQuery {
      * Gets the result of the approximation.
      * @return Result of approximation.
      */
-    public double getResult() {
+    public Double getResult() {
         return result;
     }
     /**Sets the result of the approximation.
