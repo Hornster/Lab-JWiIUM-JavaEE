@@ -11,7 +11,21 @@ import java.util.List;
 public class ServerCommand {
     /**Defines sequence of arguments in SetIntegral command.*/
     public enum setIntegralValues{
-        FORMULA(0), RANGE_BEGIN(1), RANGE_END(2);
+
+        /**
+         *Formula of integral which will be used in calculations.
+         */
+        FORMULA(0),
+
+        /**
+         *Beginning of the range of the calculation.
+         */
+        RANGE_BEGIN(1),
+
+        /**
+         *End of the range of calculation.
+         */
+        RANGE_END(2);
         public final int value;
 
         setIntegralValues(int value)
@@ -25,7 +39,20 @@ public class ServerCommand {
     }
     /**Defines sequence of arguments in SetMethod command.*/
     public enum setMethodValues{
-        METHOD(0), ACCURACY(1);
+
+        /**
+         *Method used by approximation.
+         */
+        METHOD(0),
+
+        /**
+         *Accuracy == number of geometrical shapes used in approximation.
+         */
+        ACCURACY(1);
+
+        /**
+         *Integer type value assigned to each enumeration part.
+         */
         private final int value;
 
         setMethodValues(int value)
@@ -79,10 +106,20 @@ public class ServerCommand {
     {
         this.commandType = commandType;
     }
+
+    /**
+     * Adds new value to command.
+     * @param value
+     */
     public void addValue(String value)
     {
         data.add(value);
     }
+
+    /**
+     * Adds multiple values to command at once.
+     * @param values
+     */
     public void addValues(List<String> values)
     {
         data = values;

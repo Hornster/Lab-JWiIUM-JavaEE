@@ -8,12 +8,17 @@ import java.sql.*;
  * @author Karol KozuchGroup 4 Section 8
  * @version 1.0*/
 public class QueryDBCreator {
-    
-    private String sessionDataTableDesc = "CREATE TABLE SessionsData"
+    /**
+     * Query used to recreate the SessionsData table.
+     */
+    private final String sessionDataTableDesc = "CREATE TABLE SessionsData"
             + "(short_id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1),"
             + " full_id VARCHAR(50) UNIQUE)";
-    private String queryDataTableDesc = "CREATE TABLE QueriesData"
-            + "(query_id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1),"
+    /**
+     * Query used to recreate the QueriesData table.
+     */
+    private final String queryDataTableDesc = "CREATE TABLE QueriesData"
+            + " (query_id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1),"
             + "session_id INTEGER , "
             + "formula VARCHAR(50), "
             + "range_beg FLOAT, "
@@ -22,7 +27,7 @@ public class QueryDBCreator {
             + "result FLOAT, "
             + "method CHAR, "
             + "accuracy INTEGER, "
-            + "FOREIGN KEY (session_id) REFERENCES (SessionsData.short_id)";
+            + "CONSTRAINT queryDBCstr FOREIGN KEY (session_id) REFERENCES SessionsData(short_id))";
     
     /**
      * Creates tables, if these are non-existent.
@@ -33,9 +38,15 @@ public class QueryDBCreator {
         try  {
             Statement statement = dbConnection.createStatement();
             statement.executeUpdate(sessionDataTableDesc);
-            statement.executeUpdate(queryDataTableDesc);
             
             System.out.println("Tables created");
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        }
+        
+        try  {
+            Statement statement = dbConnection.createStatement();
+            statement.executeUpdate(queryDataTableDesc);
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
         }
@@ -49,4 +60,6 @@ public class QueryDBCreator {
     {
         createTables(dbConnection);
     }
+
+    
 }

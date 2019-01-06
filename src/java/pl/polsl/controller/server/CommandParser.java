@@ -21,7 +21,51 @@ public class CommandParser {
      * Stores possible states of the commands. INCORRECT means the command is corrupted - needs to be returned to user.
      * Other indicate what type of command is this.
      */
-    public enum commandType{DISCONNECT, HELP, SET_INTEGRAL, SET_METHOD, CALCULATE, GET_HISTORY, INCORRECT, NEW_CONNECTION}
+    public enum commandType{ 
+
+        /**
+         *Client disconnected from the server.
+         */
+        DISCONNECT, 
+
+        /**
+         *Client requested help - description of commands from the server.
+         */
+        HELP, 
+
+        /**
+         *Client sent new integral data.
+         */
+        SET_INTEGRAL, 
+
+        /**
+         *Client sent new method data.
+         */
+        SET_METHOD, 
+
+        /**
+         *Client triggered calculation.
+         */
+        CALCULATE, 
+
+        /**
+         *Client requested queries history from the server.
+         */
+        GET_HISTORY, 
+
+        /**
+         *Client issued incorrect command.
+         */
+        INCORRECT, 
+
+        /**
+         *New connection has been made with the server.
+         */
+        NEW_CONNECTION}
+
+    /**
+     * Defines which types of commands are server-side only.
+     */
     private Map<commandType, Boolean> isCommandServerSideOnly = new HashMap<commandType, Boolean>();
     /**
      * Offers explanation of every command and method returning ServerCommand of INCORRECT type with customizable description.
@@ -45,6 +89,10 @@ public class CommandParser {
         isCommandServerSideOnly.replace(commandType.INCORRECT, true);   //...and make corrections where necessary.
         isCommandServerSideOnly.replace(commandType.NEW_CONNECTION, true);
     }
+
+    /**
+     *
+     */
     public CommandParser()
     {
         parsers.add(helpCommandParser);
@@ -323,6 +371,12 @@ public class CommandParser {
      */
     interface IParser
     {
+
+        /**
+         * Parses passed command.
+         * @param input Command to parse/
+         * @return ServerCommand object containing results of command parsing.
+         */
         ServerCommand parseCommand(String input);
     }
 

@@ -46,10 +46,17 @@ public class HistoryRetrieverServlet extends HttpServlet {
      */
     private void printQueries(List<SingleQuery> queries, PrintWriter out)
     {
-        for(SingleQuery query : queries)
+        if(queries.size() > 0)
         {
-            query.setLineSeparator("<br>");
-            out.println(query.toString());
+            for(SingleQuery query : queries)
+            {
+                query.setLineSeparator("<br>");
+                out.println(query.toString());
+            }
+        }
+        else
+        {
+            out.println("No queries found, darling!");
         }
     }
     /**

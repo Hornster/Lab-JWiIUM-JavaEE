@@ -42,8 +42,6 @@ public class QueryDBManager {
     }
     /**
      * Initializes the components of this class.
-     * @return FLASE if initialization went wrong and the database
-     * refuses any means of cooperation. TRUE otherwise.
      * @throws DBManagerIniException when could not establish connection with the databse.
      */
     private void iniComponents() throws DBManagerIniException

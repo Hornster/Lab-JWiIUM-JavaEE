@@ -29,13 +29,13 @@ public class QueryDBSelector {
         calcResult = rs.getFloat("result");
             
         argument = rs.getString("argument");
-        formula = rs.getString("formua");
+        formula = rs.getString("formula");
         method = rs.getString("method");
 
         accuracy = rs.getInt("accuracy");
 
         IntegralData integralData = new IntegralData(rangeBegin, rangeEnd);
-        integralData.setIntegralFunc(formula);
+        integralData.setIntegralFunc("f(" + argument + ")=" + formula);         //Database stores the function formula without the left side of the equation. This needs to be recreated.
         CalculationData calcData = new CalculationData();
         calcData.setAccuracy(accuracy);
         calcData.setCalculationMethod(method.charAt(0));
@@ -76,8 +76,8 @@ public class QueryDBSelector {
         // make a connection to DB
         try{
             Statement statement = dbConnection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData s, QueriesData q"
-                    + "WHERE s.full_id = '"+ sessionID +"' AND q.session_id = s.short_id");
+            ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData s, QueriesData q "
+                    + " WHERE s.full_id = '"+ sessionID +"' AND q.session_id = s.short_id");
             
             results = readResultSet(rs);
             rs.close();
@@ -99,9 +99,9 @@ public class QueryDBSelector {
         SingleQuery result = null;
         
         try(Statement statement = dbConnection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData s, QueriesData q"
-                    + "WHERE s.full_id = "+ "'" + sessionID + "'" +" AND q.session_id = s.short_id"
-                            + "ORDER BY q.session_id ASC");){
+            ResultSet rs = statement.executeQuery("SELECT * FROM SessionsData, QueriesData "
+                    + " WHERE SessionsData.full_id = "+ "'" + sessionID + "'" +" AND QueriesData.session_id = SessionsData.short_id "
+                    + " ORDER BY QueriesData.query_id DESC");){
             
             if(rs.next())
             {
@@ -110,7 +110,6 @@ public class QueryDBSelector {
             rs.close();
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
-            return result;
         }
         
         return result;
@@ -126,8 +125,9 @@ public class QueryDBSelector {
         SingleQuery result = null;
         
         try(Statement statement = dbConnection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM QueriesData q"
-                            + "WHERE q.query_id = '" + queryID + "'");
+            ResultSet rs = statement.executeQuery("SELECT * FROM QueriesData "
+                            + " WHERE QueriesData.query_id = " + queryID
+                            + " ORDER BY QueriesData.session_id DESC");
                 )
         {
             
@@ -138,7 +138,34 @@ public class QueryDBSelector {
             rs.close();
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
-            return result;
+        }
+        
+        return result;
+    }
+    /**
+     * Reads last query made by user under given sessionID.
+     * @param dbConnection Connection to the database.
+     * @param sessionID Local ID of the session
+     * @return Last made query of the user. If none made - returns null.
+     */
+    public SingleQuery readLastQueryByLocalSessionID(Connection dbConnection, int sessionID)
+    {
+        SingleQuery result = null;
+        
+        try(Statement statement = dbConnection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM QueriesData "
+                            + " WHERE QueriesData.session_id = " + sessionID
+                            + " ORDER BY QueriesData.query_id DESC");
+                )
+        {
+            
+            if(rs.next())
+            {
+                result = readSingleQuery(rs);
+            }
+            rs.close();
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
         }
         
         return result;
@@ -179,14 +206,14 @@ public class QueryDBSelector {
     {
         int lastQueryID = -1;
         try(Statement statement = dbConnection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT q.query_id FROM QueriesData q"
-                                                    + "WHERE q.session_id = " + sessionID
-                                                    + "ORDER BY q.query_id DESC");
+            ResultSet rs = statement.executeQuery("SELECT query_id FROM QueriesData "
+                                                    + " WHERE QueriesData.session_id = " + sessionID
+                                                    + " ORDER BY QueriesData.query_id DESC");
                 )
         {
             if(rs.next())
             {
-                lastQueryID = rs.getInt("session_id");
+                lastQueryID = rs.getInt("query_id");
             }
             rs.close();
         } catch (SQLException sqle) {

@@ -10,32 +10,33 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import javax.xml.parsers.*;
-import javax.xml.xpath.*;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 /**Manages connection with the Queries Database.
  *
  * @author Karol KozuchGroup 4 Section 8
  * @version 1.0*/
-public class QueryDBConnectionManager {
+@WebListener
+public class QueryDBConnectionManager  implements ServletContextListener {
     /**
      * Stores database url
      */
-    private String url;
+    private static String url;
     /**
      * Stores database username
      */
-    private String username;
+    private static String username;
     /**
      * Stores database password
      */
-    private String password;
+    private static String password;
     /**
      * Driver used by the database.
      */
-    private String driver;
+    private static String driver;
     /**
      * Connection to the database
      */
@@ -45,13 +46,13 @@ public class QueryDBConnectionManager {
      * Loads connection ata from a web.xml file.
      * @return TRUE if data has been loaded correctly. FALSE otherwise.
      */
-    private boolean loadConnectionData()
+    /*private boolean loadConnectionData()
     {
         try
         {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse("web" + File.separator + "WEB-INF" + File.separator + "queryDBConfig.xml");
+            Document document = builder.parse("web" + File.separator + "WEB-INF" + File.separator + configFile);
             
             url = document.getElementsByTagName("url").item(0).getTextContent();
             username = document.getElementsByTagName("username").item(0).getTextContent();
@@ -60,7 +61,7 @@ public class QueryDBConnectionManager {
         }
         catch(SAXException ex)    
         {
-            System.out.println("Could not parse web.xml. Reason: \n"+ ex.getMessage());
+            System.out.println("Could not parse "+ configFile +" Reason: \n"+ ex.getMessage());
             return false;
         }
         catch(IOException ex)
@@ -74,7 +75,7 @@ public class QueryDBConnectionManager {
             return false;
         }
         return true;
-    }
+    }*/
    
     /**
      * Initializes connection with the database.
@@ -84,14 +85,9 @@ public class QueryDBConnectionManager {
     {
         try {
             // loading the JDBC driver
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            Class.forName(driver);
         } catch (ClassNotFoundException cnfe) {
             System.err.println("Could not load the database driver. Reason: \n" + cnfe.getMessage());
-            return false;
-        }
-        
-        if(!loadConnectionData())
-        {
             return false;
         }
         try
@@ -115,5 +111,31 @@ public class QueryDBConnectionManager {
     public Connection getDBConnection()
     {
         return dbConnection;
+    }
+    /**
+     * Initializes data required to establish connection with the database server. Reads from web.xml file.
+     * @param sce Context through which the data is read from the web.xml file. Passed as event argument.
+     */
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        ServletContext ctx = sce.getServletContext();
+        
+        String dbUrl = ctx.getInitParameter("dbUrl");
+        String dbUsername = ctx.getInitParameter("dbUser");
+        String dbPassword = ctx.getInitParameter("dbPassword");
+        String dbDriver = ctx.getInitParameter("dbDriver");
+        
+        QueryDBConnectionManager.url = dbUrl;
+    	QueryDBConnectionManager.username = dbUsername;
+    	QueryDBConnectionManager.password = dbPassword;
+        QueryDBConnectionManager.driver = dbDriver;
+    }
+    /**
+     * Currently does nothing. Is here because of need of ServletContextListener interface implementation.
+     * @param sce Argument passed when context is destroyed (event).
+     */
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        //Nothing to do here, to be honest
     }
 }

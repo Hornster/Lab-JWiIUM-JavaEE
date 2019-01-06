@@ -92,6 +92,7 @@ public class IntegralData {
         exp1 = new Expression(integralFunc.getFunctionName() + "(" + argument + ")",integralFunc);
         exp1.addArguments(new Argument(argument.toString(), 0.0));
     }
+    
     /**Getter for the beginning of the integral range.
      * @return The beginning of the integral range.*/
     public  double getBeginning()

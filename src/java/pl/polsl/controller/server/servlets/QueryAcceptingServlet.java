@@ -34,10 +34,6 @@ import pl.polsl.model.querydb.QueryDBManager;
  */
 public class QueryAcceptingServlet extends HttpServlet implements CalcResultListener {
     /**
-     * Stores ID given by the database to the user that has recently made a query.
-     */
-    private int lastInnerSessionID;
-    /**
      * Stores ID of last made query.
      */
     private int lastMadeQueryID;
@@ -57,13 +53,11 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
      * Creates commands out of parameters that are parsed later on.
      */
     private CommandWrapper commandWrapper = new CommandWrapper();
-    
     /**
      * Parses passed parameters using info about command which they belong to.
      * @param parameters List of parameters.
      * @param parameterType Type of command which the parameters are for, for example SET_INTEGRAL.
      * @return ServerCommand instance with info about parsed parameters. If something was not right -
-     * @return commandType field in ServerCommand will be set to INCORRECT.
      */
     private ServerCommand parseIntegralData(List<String> parameters, CommandParser.commandType parameterType)
     {
@@ -85,11 +79,12 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
     {
         Connection dbConnection = queryDBManager.getDBConnection();
         queryDBManager.getInserter().insertData(dbConnection, sessionID);
-        lastInnerSessionID = queryDBManager.getSelector().getInternalSessionID(dbConnection, sessionID);
+        int innerSessionID = queryDBManager.getSelector().getInternalSessionID(dbConnection, sessionID);
         
-        lastMadeQueryID = queryDBManager.getSelector().getLastQueryID(dbConnection, lastInnerSessionID);
+        queryDBManager.getInserter().insertData(dbConnection, innerSessionID, lastQuery);
         
-        queryDBManager.getInserter().insertData(dbConnection, lastInnerSessionID, lastQuery);
+        lastMadeQueryID = queryDBManager.getSelector().getLastQueryID(dbConnection, innerSessionID);
+        
     }
     /**
      * Reads parameters from passed request.
@@ -138,12 +133,13 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
     }
     /**
      * Creates new cookie that contains index of last query made by the user.
-     * @param queryIndex
+     * @param cookieValue Index of the value of the cookie.
+     * @param cookieName Name of the cookie that will store the information.
      * @return Cookie with information about index of last made query by the user.
      */
-    private Cookie assignCookie(Integer queryIndex)
+    private Cookie assignCookie(String cookieName, Integer cookieValue)
     {
-        return new Cookie(LastQueryCookieServlet.lastQueryCookieName, queryIndex.toString());
+        return new Cookie(cookieName, cookieValue.toString());
     }
     
     public QueryAcceptingServlet()
@@ -171,12 +167,11 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+        lastMadeQueryID = -1;       //Reset the query ID - someone who hasn't made any queries can connect too. Just for the case.
         //Add the SessionData object to this session, if not done yet.
         backendContainer.sessionData.ChkIfSessionBound(request.getSession());
         
         try (PrintWriter out = response.getWriter()) {
-            
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -186,8 +181,7 @@ public class QueryAcceptingServlet extends HttpServlet implements CalcResultList
             out.println("<body>");
             String answer = readParams(request);
             out.println(answer);
-            response.addCookie(assignCookie(lastMadeQueryID));            
-            response.addCookie(assignCookie(lastInnerSessionID));
+            response.addCookie(assignCookie(LastQueryCookieServlet.lastQueryCookieName, lastMadeQueryID));
             out.println("</body>");
             out.println("</html>");
         }

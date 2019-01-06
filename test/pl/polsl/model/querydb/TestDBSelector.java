@@ -63,7 +63,7 @@ public class TestDBSelector {
         calcData.setCalculationMethod('s');
         calcData.setResult(-9000);
         
-        query2 = new SingleQuery(integralData, calcData);
+        query3 = new SingleQuery(integralData, calcData);
     }
     //Check if it is possible to initialize the database connection.
     public void iniManager() throws DBManagerIniException
@@ -96,13 +96,13 @@ public class TestDBSelector {
     {
         QueryDBSelector selector = queryDBManager.getSelector();
         
-        return selector.readLastQuery(dbConnection, sessionID1);
+        return selector.readLastQuery(dbConnection, sessionID);
     }
     private SingleQuery testRetreiveLastQueryByQIndex(int sessionID)
     {
         QueryDBSelector selector = queryDBManager.getSelector();
         
-        return selector.readLastQuery(dbConnection, sessionID1);
+        return selector.readLastQueryByLocalSessionID(dbConnection, sessionID);
     }
     private List<SingleQuery> testRetrieveQueries(String sessionID)
     {
@@ -128,15 +128,13 @@ public class TestDBSelector {
             Assert.assertEquals(-1, localID3);
             
             queryID1 = testMakeQuery(localID1, query1);
-            queryID2 = testMakeQuery(localID1, query3);
-            queryID3 = testMakeQuery(localID2, query2);
+            queryID3 = testMakeQuery(localID1, query3);
+            queryID2 = testMakeQuery(localID2, query2);
                 //Test query retreival by index
             SingleQuery retreivedQuery = testRetreiveLastQueryByQIndex(localID1);
             Assert.assertEquals(query3, retreivedQuery);
             retreivedQuery = testRetreiveLastQueryByQIndex(localID2);
             Assert.assertEquals(query2, retreivedQuery);
-            retreivedQuery = testRetreiveLastQueryByQIndex(localID2);
-            Assert.assertFalse("Error - query has been found even if it wasn't supposed to be found!",!(query2.equals(retreivedQuery)));
                 //Test query retreival by session full ID
             retreivedQuery = testRetreiveLastQueryByString(sessionID1);
             Assert.assertEquals(query3, retreivedQuery);
@@ -150,7 +148,7 @@ public class TestDBSelector {
             retrievedQueries = testRetrieveQueries(sessionID2);
             Assert.assertTrue("The list of queries is NOT supposed to be emtpy here!", retrievedQueries.size() > 0);
             retrievedQueries = testRetrieveQueries(sessionID3);
-            Assert.assertNull("The list of queries IS SUPPOSED to be emtpy here!", retrievedQueries.size() <= 0);
+            Assert.assertTrue("The list of queries IS SUPPOSED to be emtpy here!", retrievedQueries.size() <= 0);
             
         }
         catch(DBManagerIniException ex)

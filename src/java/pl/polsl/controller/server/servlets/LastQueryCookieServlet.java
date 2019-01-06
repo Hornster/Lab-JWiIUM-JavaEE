@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import pl.polsl.model.BackendContainer;
 import pl.polsl.model.PredefinedCommunicates;
-import pl.polsl.model.exceptions.NoQueryFoundException;
 import pl.polsl.model.queryHistory.SingleQuery;
 import pl.polsl.model.querydb.DBManagerIniException;
 import pl.polsl.model.querydb.QueryDBManager;
@@ -73,9 +72,17 @@ public class LastQueryCookieServlet extends HttpServlet {
             }
 
             SingleQuery requestedQuery = queryDBManager.getSelector().readLastQuery(dbConnection, queryIndex);
-            requestedQuery.setLineSeparator("<br />");
+            
+            if(requestedQuery == null)      //If there's a positive ID provided by user, if they put random number in there "requestedQuery" will be null!
+            {
+                return "No such query found, darling!";
+            }
+            else
+            {
+                requestedQuery.setLineSeparator("<br />");
 
-            return requestedQuery.toString();
+                return requestedQuery.toString();
+            }
         }
         else
         {
